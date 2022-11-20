@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -8,11 +8,11 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 /**
- * Class, describing user contacts and credentials, used in Java code and RDBMS
+ * User data transfer object, visible to end-user.
  */
 @Data
 @Accessors(chain = true)
-public class User {
+public class UserDto {
     private long userId;
     @NotNull
     private String name;
