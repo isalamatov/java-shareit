@@ -7,7 +7,7 @@ public class ItemMapper {
 
     public static Item toItem(ItemDto itemDto) {
         return new Item()
-                .setItemId(itemDto.getItemId())
+                .setId(itemDto.getId())
                 .setName(itemDto.getName())
                 .setDescription(itemDto.getDescription())
                 .setAvailable(itemDto.getAvailable());
@@ -15,7 +15,7 @@ public class ItemMapper {
 
     public static ItemDto toItemDto(Item item) {
         return new ItemDto()
-                .setItemId(item.getItemId())
+                .setId(item.getId())
                 .setName(item.getName())
                 .setDescription(item.getDescription())
                 .setAvailable(item.getAvailable())

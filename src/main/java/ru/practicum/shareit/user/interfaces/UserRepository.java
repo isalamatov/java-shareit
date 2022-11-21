@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.interfaces;
 
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 
 import java.util.List;
 
@@ -11,6 +12,8 @@ public interface UserRepository {
 
     User update(User user);
 
+    User partialUpdate(UserPartialUpdateDto userPartialUpdateDto);
+
     void delete(Long userId);
 
     List<User> getAll();
@@ -18,4 +21,5 @@ public interface UserRepository {
     boolean isUserExists(String email);
 
     boolean isUserExists(Long userId);
+
 }

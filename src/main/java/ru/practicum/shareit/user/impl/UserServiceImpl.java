@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 import ru.practicum.shareit.user.exceptions.UserAlreadyExistsException;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 import ru.practicum.shareit.user.interfaces.UserRepository;
@@ -32,6 +33,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User partialUpdate(UserPartialUpdateDto userPartialUpdateDto) {
+        log.debug("Update user request was received in service {}, with data {}",
+                this.getClass(),
+                userPartialUpdateDto.toString());
+        User updatedUser;
+        if (!(userPartialUpdateDto.getEmail() == null) &&
+                userRepository.isUserExists(userPartialUpdateDto.getEmail())) {
+            throw new UserAlreadyExistsException(userPartialUpdateDto.getEmail());
+        }
+        if (userRepository.isUserExists(userPartialUpdateDto.getId())) {
+            updatedUser = userRepository.partialUpdate(userPartialUpdateDto);
+        } else {
+            throw new UserDoesNotExistException(userPartialUpdateDto.getId());
+        }
+        log.debug("User {} was updated successfully in service {}", updatedUser.toString(), this.getClass());
+        return updatedUser;
+    }
+
+    @Override
     public User get(Long userId) {
         log.debug("Get user request is received in service {}, with id {}", this.getClass(), userId);
         User user;
@@ -48,14 +68,15 @@ public class UserServiceImpl implements UserService {
     public User update(User user) {
         log.debug("Update user request was received in service {}, with data {}", this.getClass(), user.toString());
         User updatedUser;
-        if (userRepository.isUserExists(user.getEmail())) {
+        if (userRepository.isUserExists(user.getId())) {
             updatedUser = userRepository.update(user);
         } else {
-            throw new UserDoesNotExistException(user.getUserId());
+            throw new UserDoesNotExistException(user.getId());
         }
         log.debug("User {} was updated successfully in service {}", updatedUser.toString(), this.getClass());
         return updatedUser;
     }
+
 
     @Override
     public void delete(Long userId) {

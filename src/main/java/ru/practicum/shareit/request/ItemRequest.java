@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @Data
 @Accessors(chain = true)
 public class ItemRequest {
-    private long ItemRequestId;
+    private long itemRequestId;
     @NotNull
     private String description;
     @NotNull

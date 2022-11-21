@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 import ru.practicum.shareit.user.interfaces.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@RequestBody UserDto userDto) {
+    public UserDto create(@Valid @RequestBody UserDto userDto) {
         log.debug("Create request was received in controller {} with data {}", this.getClass(), userDto.toString());
         User user = UserMapper.toUser(userDto);
         User createdUser = userService.create(user);
@@ -45,12 +47,23 @@ public class UserController {
         return users.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
-    @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    @PutMapping("/{userId}")
+    public UserDto update(@PathVariable Long userId, @Valid @RequestBody UserDto userDto) {
         log.debug("Update request was received in controller {} with data {}", this.getClass(), userDto.toString());
-        userDto.setUserId(userId);
         User user = UserMapper.toUser(userDto);
+        user.setId(userId);
         User updatedUser = userService.update(user);
+        log.debug("User {} was updated successfully in controller {}", updatedUser.toString(), this.getClass());
+        return UserMapper.toUserDto(updatedUser);
+    }
+
+    @PatchMapping("/{userId}")
+    public UserDto partialUpdate(@PathVariable Long userId, @Valid @RequestBody UserPartialUpdateDto userPartialUpdateDto) {
+        log.debug("Update request was received in controller {} with data {}",
+                this.getClass(),
+                userPartialUpdateDto.toString());
+        userPartialUpdateDto.setId(userId);
+        User updatedUser = userService.partialUpdate(userPartialUpdateDto);
         log.debug("User {} was updated successfully in controller {}", updatedUser.toString(), this.getClass());
         return UserMapper.toUserDto(updatedUser);
     }
