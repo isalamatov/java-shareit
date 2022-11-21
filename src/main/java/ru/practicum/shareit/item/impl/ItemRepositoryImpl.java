@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemPartialUpdateDto;
+import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
 import ru.practicum.shareit.item.interfaces.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 
@@ -31,7 +32,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             return v;
         });
         items.putIfAbsent(createdItem.getOwner().getId(), new ArrayList<>(Collections.singletonList(item)));
-        log.debug("Item {} was created successfully in repository {}", createdItem.toString(), this.getClass());
+        log.debug("Item {} was created successfully in repository {}", createdItem, this.getClass());
         return createdItem;
     }
 
@@ -40,8 +41,8 @@ public class ItemRepositoryImpl implements ItemRepository {
         log.debug("Get item request was received in repository {}, with data {}", this.getClass(), itemId);
         Item item = items.values().stream()
                 .flatMap(Collection::stream)
-                .filter(x -> x.getId() == itemId)
-                .findFirst().get();
+                .filter(x -> Objects.equals(x.getId(), itemId))
+                .findFirst().orElseThrow(() -> new ItemDoesNotExistException(itemId));
         log.debug("Item with id {} was retrieved successfully in repository {}", itemId, this.getClass());
         return item;
     }
@@ -49,20 +50,20 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item update(Item item) {
         log.debug("Update item request was received in repository {}, with data {}", this.getClass(), item.toString());
-        items.compute(item.getOwner().getId(), (k, v) -> {
-            v.removeIf(x -> x.getId() == item.getId());
+        items.computeIfPresent(item.getOwner().getId(), (k, v) -> {
+            v.removeIf(x -> Objects.equals(x.getId(), item.getId()));
             v.add(item);
             return v;
         });
-        log.debug("Item {} was updated successfully in repository {}", items.toString(), this.getClass());
+        log.debug("Item {} was updated successfully in repository {}", item, this.getClass());
         return item;
     }
 
     @Override
     public Item partialUpdate(Long ownerId, ItemPartialUpdateDto itemPartialUpdateDto) {
         Item updatedItem = items.get(ownerId).stream()
-                .filter(x -> x.getId() == itemPartialUpdateDto.getId())
-                .findFirst().get();
+                .filter(x -> Objects.equals(x.getId(), itemPartialUpdateDto.getId()))
+                .findFirst().orElseThrow(() -> new ItemDoesNotExistException(itemPartialUpdateDto.getId()));
         Field[] fields = itemPartialUpdateDto.getClass().getDeclaredFields();
         Field[] itemFields = updatedItem.getClass().getDeclaredFields();
         for (Field field : fields) {
@@ -72,7 +73,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                     Field userField = Arrays.stream(itemFields)
                             .sequential()
                             .filter(x -> x.getName().equalsIgnoreCase(field.getName()))
-                            .findFirst().get();
+                            .findFirst().orElseThrow(RuntimeException::new);
                     userField.setAccessible(true);
                     userField.set(updatedItem, field.get(itemPartialUpdateDto));
                 }
@@ -81,7 +82,7 @@ public class ItemRepositoryImpl implements ItemRepository {
             }
         }
         items.computeIfPresent(updatedItem.getOwner().getId(), (k, v) -> {
-            v.removeIf(x -> x.getId() == updatedItem.getId());
+            v.removeIf(x -> Objects.equals(x.getId(), updatedItem.getId()));
             v.add(updatedItem);
             return v;
         });
@@ -92,7 +93,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     public void delete(Long ownerId, Long itemId) {
         log.debug("Delete itemId request was received in repository {}, with data {}", this.getClass(), itemId);
         items.computeIfPresent(ownerId, (k, v) -> {
-            v.removeIf(x -> x.getId() == itemId);
+            v.removeIf(x -> Objects.equals(x.getId(), itemId));
             return v;
         });
         log.debug("Item with id {} was deleted successfully from repository {}", itemId, this.getClass());
@@ -117,12 +118,13 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public boolean isItemExists(Long ownerId, Long itemId) {
-        return items.containsKey(ownerId) && items.get(ownerId).stream().anyMatch(x -> x.getId() == itemId);
+        return items.containsKey(ownerId)
+                && items.get(ownerId).stream().anyMatch(x -> Objects.equals(x.getId(), itemId));
     }
 
     @Override
     public boolean isItemExists(Long itemId) {
-        return items.values().stream().flatMap(Collection::stream).anyMatch(v -> v.getId() == itemId);
+        return items.values().stream().flatMap(Collection::stream).anyMatch(v -> Objects.equals(v.getId(), itemId));
     }
 
 }
