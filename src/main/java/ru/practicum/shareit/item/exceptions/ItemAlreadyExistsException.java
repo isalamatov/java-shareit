@@ -7,6 +7,5 @@ public class ItemAlreadyExistsException extends RuntimeException {
 
     public ItemAlreadyExistsException(long itemId) {
         super(String.format("Item with id %d already exists", itemId));
-        log.debug("Item with id {} already exists", itemId);
     }
 }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.dto.ItemPartialUpdateDto;
@@ -12,16 +13,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final HashMap<Long, List<Item>> items;
+    private final Map<Long, List<Item>> items = new HashMap<>();
 
     private long idCounter = 1L;
-
-    public ItemRepositoryImpl() {
-        this.items = new HashMap<>();
-    }
 
     @Override
     public Item create(Item item) {
@@ -73,12 +71,12 @@ public class ItemRepositoryImpl implements ItemRepository {
                     Field userField = Arrays.stream(itemFields)
                             .sequential()
                             .filter(x -> x.getName().equalsIgnoreCase(field.getName()))
-                            .findFirst().orElseThrow(RuntimeException::new);
+                            .findFirst().orElseThrow(NoSuchFieldException::new);
                     userField.setAccessible(true);
                     userField.set(updatedItem, field.get(itemPartialUpdateDto));
                 }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                log.warn("Mapping partial DTO fields error with message {}", e.getMessage());
             }
         }
         items.computeIfPresent(updatedItem.getOwner().getId(), (k, v) -> {
