@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,16 +8,16 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
- * Class, describing user contacts and credentials, used in Java code and RDBMS
+ * User data transfer object, visible to end-user.
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class User {
+public class UserDto {
     private long id;
     @NotBlank(message = "User name should not be blank")
     private String name;
-    @NotBlank(message = "User e-mail should not be blank")
-    @Email
+    @NotBlank(message = "Email should not be blank")
+    @Email(message = "Email should be valid")
     private String email;
 }
