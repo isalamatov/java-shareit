@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS bookings
 
 CREATE TABLE IF NOT EXISTS comments
 (
-    comment_id bigint GENERATED ALWAYS AS IDENTITY,
+    comment_id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
     text character varying(255),
     item_id bigint,
     author_id bigint,

@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 import ru.practicum.shareit.user.exceptions.UserAlreadyExistsException;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;

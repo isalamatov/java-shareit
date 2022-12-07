@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.comments.dto.CommentDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,7 +15,6 @@ import java.util.List;
  */
 
 @Data
-@NoArgsConstructor
 @Accessors(chain = true)
 public class ItemDto {
     private Long id;

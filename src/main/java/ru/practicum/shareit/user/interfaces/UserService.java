@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.interfaces;
 
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 
 import java.util.List;

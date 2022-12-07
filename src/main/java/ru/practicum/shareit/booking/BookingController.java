@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.interfaces.BookingService;
+import ru.practicum.shareit.booking.model.Booking;
 
 import java.util.List;
 

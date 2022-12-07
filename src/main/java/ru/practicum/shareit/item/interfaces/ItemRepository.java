@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.interfaces;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.Set;
