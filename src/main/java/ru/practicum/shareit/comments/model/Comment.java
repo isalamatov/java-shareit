@@ -1,35 +1,32 @@
-package ru.practicum.shareit.comments;
+package ru.practicum.shareit.comments.model;
 
 import lombok.*;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
-/**
- * Class, describing request for specific item, issued by a specific user.
- */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "comments")
 @Accessors(chain = true)
-@Entity
-@Table(name = "comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
+    @Column(name = "comment_id")
+    private Long commentId;
     @Column(name = "text")
     private String text;
-
     @JoinColumn(name = "item_id")
     @OneToOne
     private Item item;
-
     @JoinColumn(name = "author_id")
     @OneToOne
     private User author;
+    @Column(name = "created")
+    private LocalDateTime created;
 }

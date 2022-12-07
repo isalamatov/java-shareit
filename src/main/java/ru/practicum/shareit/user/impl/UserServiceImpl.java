@@ -3,12 +3,12 @@ package ru.practicum.shareit.user.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserPartialUpdateDto;
 import ru.practicum.shareit.user.exceptions.UserAlreadyExistsException;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 import ru.practicum.shareit.user.interfaces.UserRepository;
 import ru.practicum.shareit.user.interfaces.UserService;
+import ru.practicum.shareit.user.model.User;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -18,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
 
     @Override
@@ -84,11 +83,10 @@ public class UserServiceImpl implements UserService {
         return updatedUser;
     }
 
-
     @Override
     public void delete(Long userId) {
         log.debug("Delete user request is received in controller {}, with id {}", this.getClass(), userId);
-        User user = userRepository.findById(userId).orElseThrow(()-> new UserDoesNotExistException(userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserDoesNotExistException(userId));
         userRepository.delete(user);
         log.debug("User with id {} was deleted successfully in service {}", userId, this.getClass());
     }

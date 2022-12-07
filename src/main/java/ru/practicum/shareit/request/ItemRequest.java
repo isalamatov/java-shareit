@@ -2,7 +2,7 @@ package ru.practicum.shareit.request;
 
 import lombok.*;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.exceptions.BookingDoesNotExistsException;
@@ -14,7 +14,7 @@ import ru.practicum.shareit.booking.interfaces.BookingService;
 import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
 import ru.practicum.shareit.item.interfaces.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 import ru.practicum.shareit.user.interfaces.UserRepository;
 
@@ -140,7 +140,6 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT: {
                 return bookings
                         .stream()
-                        .filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED))
                         .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
                         .filter(booking -> booking.getEnd().isAfter(LocalDateTime.now()))
                         .sorted(Comparator.comparing(Booking::getStart).reversed())

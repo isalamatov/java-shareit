@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.interfaces;
 
-import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.enums.State;
 
 import java.util.List;
