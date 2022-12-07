@@ -6,17 +6,18 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
-import java.time.ZonedDateTime;
-
 /**
  * Booking data transfer object
  */
 @Data
 @Accessors(chain = true)
 public class BookingDto {
-    private ZonedDateTime start;
-    private ZonedDateTime end;
+    private Long id;
+    private String start;
+    private String end;
     private Item item;
     private User booker;
+    private Long itemId;
+    private Long bookerId;
     private BookingStatus status;
 }

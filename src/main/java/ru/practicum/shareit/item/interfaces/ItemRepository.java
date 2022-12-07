@@ -1,26 +1,17 @@
 package ru.practicum.shareit.item.interfaces;
 
-import ru.practicum.shareit.item.dto.ItemPartialUpdateDto;
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 
 import java.util.List;
+import java.util.Set;
 
-public interface ItemRepository {
-    Item create(Item item);
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    Item get(Long itemId);
+    Set<Item> findAllByDescriptionContainsIgnoreCase(String text);
 
-    Item update(Item item);
+    Set<Item> findAllByNameContainsIgnoreCase(String text);
 
-    Item partialUpdate(Long ownerId, ItemPartialUpdateDto itemPartialUpdateDto);
-
-    void delete(Long ownerId, Long itemId);
-
-    List<Item> getAll(Long ownerId);
-
-    List<Item> search(String text);
-
-    boolean isItemExists(Long ownerId, Long itemId);
-
-    boolean isItemExists(Long itemId);
+    List<Item> findAllByOwner(User owner);
 }

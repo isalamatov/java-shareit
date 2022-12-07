@@ -3,9 +3,11 @@ package ru.practicum.shareit.item.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Item data transfer object, visible to end user.
@@ -23,4 +25,7 @@ public class ItemDto {
     @NotNull
     private Boolean available;
     private Long request;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
+    private List<CommentDto> comments;
 }
