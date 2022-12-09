@@ -10,8 +10,6 @@ import ru.practicum.shareit.user.interfaces.UserRepository;
 import ru.practicum.shareit.user.interfaces.UserService;
 import ru.practicum.shareit.user.model.User;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -40,22 +38,11 @@ public class UserServiceImpl implements UserService {
         }
         updatedUser = userRepository.findById(userPartialUpdateDto.getId())
                 .orElseThrow(() -> new UserDoesNotExistException(userPartialUpdateDto.getId()));
-        Field[] fields = userPartialUpdateDto.getClass().getDeclaredFields();
-        Field[] userFields = updatedUser.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            try {
-                if (field.get(userPartialUpdateDto) != null) {
-                    Field userField = Arrays.stream(userFields)
-                            .sequential()
-                            .filter(x -> x.getName().equalsIgnoreCase(field.getName()))
-                            .findFirst().get();
-                    userField.setAccessible(true);
-                    userField.set(updatedUser, field.get(userPartialUpdateDto));
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+        if (userPartialUpdateDto.getName() != null) {
+            updatedUser.setName(userPartialUpdateDto.getName());
+        }
+        if (userPartialUpdateDto.getEmail() != null) {
+            updatedUser.setEmail(userPartialUpdateDto.getEmail());
         }
         userRepository.save(updatedUser);
         log.debug("User {} was updated successfully in service {}", updatedUser, this.getClass());

@@ -15,6 +15,10 @@ public interface CommentMapper {
     @Mapping(target = "id", source = "commentId")
     CommentDto toDto(Comment comment);
 
+    @Mapping(target = "created", source = "created", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "commentId", source = "id")
     Comment toComment(CommentDto commentDto);
 
     List<CommentDto> toDto(Collection<Comment> comment);

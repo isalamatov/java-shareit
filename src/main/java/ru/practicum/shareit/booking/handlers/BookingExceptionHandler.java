@@ -1,7 +1,5 @@
 package ru.practicum.shareit.booking.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -60,11 +58,8 @@ public class BookingExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public String handleIllegalArgumentException() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        Gson gson = gsonBuilder.setPrettyPrinting().create();
-        ErrorForPostman error = new ErrorForPostman("Unknown state: UNSUPPORTED_STATUS");
-        return gson.toJson(error);
+    public UnsupportedStatusException handleIllegalArgumentException() {
+        return new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @ExceptionHandler(BookingStatusChangeException.class)

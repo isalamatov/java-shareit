@@ -26,6 +26,7 @@ public class BookingController {
         log.debug("Create booking request was received in controller {} with data {}",
                 this.getClass(),
                 bookingDto.toString());
+        bookingService.validate(bookingDto);
         Booking booking = mapper.dtoToBooking(bookingDto.setBookerId(userId));
         Booking createdBooking = bookingService.create(booking);
         log.debug("Booking {} was created successfully in controller {}", createdBooking.toString(), this.getClass());

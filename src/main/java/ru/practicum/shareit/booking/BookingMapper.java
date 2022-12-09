@@ -1,92 +1,40 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
-import ru.practicum.shareit.item.interfaces.ItemRepository;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
-import ru.practicum.shareit.user.interfaces.UserRepository;
+import ru.practicum.shareit.item.interfaces.ItemService;
+import ru.practicum.shareit.user.interfaces.UserService;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Component
-public class BookingMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        componentModel = "spring",
+        injectionStrategy = InjectionStrategy.FIELD,
+        uses = {ItemService.class, UserService.class})
+@AllArgsConstructor
+public abstract class BookingMapper {
 
-    private final UserRepository userRepository;
+    public static final BookingMapper INSTANCE = Mappers.getMapper(BookingMapper.class);
 
-    private final ItemRepository itemRepository;
+    @Mapping(source = "bookerId", target = "booker")
+    @Mapping(source = "itemId", target = "item")
+    @Mapping(target = "status", defaultValue = "WAITING")
+    public abstract Booking dtoToBooking(BookingDto bookingDto);
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    @Mapping(target = "item.request", ignore = true)
+    @Mapping(target = "id", source = "bookingId")
+    @Mapping(target = "bookerId", source = "booker.id")
+    @Mapping(target = "itemId", source = "item.id")
+    public abstract BookingDto bookingToDto(Booking booking);
 
-    @Autowired
-    protected BookingMapper(UserRepository userRepository, ItemRepository itemRepository) {
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
+    public abstract List<Booking> dtoToBooking(Collection<BookingDto> bookingDto);
 
-    public Booking dtoToBooking(BookingDto bookingDto) {
-        Booking booking = new Booking();
-        User user = userRepository.findById(bookingDto.getBookerId())
-                .orElseThrow(() -> new UserDoesNotExistException(bookingDto.getBookerId()));
-        Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> new ItemDoesNotExistException(bookingDto.getItemId()));
-        LocalDateTime start = LocalDateTime.parse(bookingDto.getStart(), formatter);
-        LocalDateTime end = LocalDateTime.parse(bookingDto.getEnd(), formatter);
-        if (start.isBefore(LocalDateTime.now()) || end.isBefore(LocalDateTime.now()) || end.isBefore(start)) {
-            throw new IllegalArgumentException("Start and end time should be correct value");
-        }
-        return booking
-                .setStart(start)
-                .setEnd(end)
-                .setItem(item).setBooker(user)
-                .setStatus(BookingStatus.WAITING);
-    }
-
-    public BookingDto bookingToDto(Booking booking) {
-        BookingDto bookingDto = new BookingDto();
-        return bookingDto
-                .setId(booking.getBookingId())
-                .setStart(booking.getStart().format(formatter))
-                .setEnd(booking.getEnd().format(formatter))
-                .setItemId(booking.getItem().getId())
-                .setBookerId(booking.getBooker().getId())
-                .setItem(booking.getItem())
-                .setBooker(booking.getBooker())
-                .setStatus(booking.getStatus());
-    }
-
-    public List<BookingDto> bookingToDto(Collection<Booking> bookings) {
-        if (bookings == null) {
-            return null;
-        }
-
-        List<BookingDto> list = new ArrayList<>(bookings.size());
-        for (Booking booking : bookings) {
-            list.add(bookingToDto(booking));
-        }
-
-        return list;
-    }
-
-    public List<Booking> dtoToBooking(Collection<BookingDto> bookingDtos) {
-        if (bookingDtos == null) {
-            return null;
-        }
-
-        List<Booking> list = new ArrayList<>(bookingDtos.size());
-        for (BookingDto bookingDto : bookingDtos) {
-            list.add(dtoToBooking(bookingDto));
-        }
-
-        return list;
-    }
+    public abstract List<BookingDto> bookingToDto(Collection<Booking> booking);
 }

@@ -20,4 +20,6 @@ public interface ItemService {
     List<ItemDto> getAll(Long ownerId);
 
     List<Item> search(String text);
+
+    Item map(Long itemId);
 }

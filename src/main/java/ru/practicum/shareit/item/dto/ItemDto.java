@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.comments.dto.CommentDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
+    private UserDto owner;
     private Long request;
     private BookingDto lastBooking;
     private BookingDto nextBooking;

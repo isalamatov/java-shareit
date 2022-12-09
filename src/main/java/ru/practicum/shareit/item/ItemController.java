@@ -11,6 +11,8 @@ import ru.practicum.shareit.comments.interfaces.CommentService;
 import ru.practicum.shareit.item.interfaces.ItemService;
 import ru.practicum.shareit.comments.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.interfaces.UserService;
 
@@ -31,11 +33,14 @@ public class ItemController {
     private final ItemMapper mapper;
     private final CommentMapper commentMapper;
     private final CommentService commentService;
+    private final UserMapper userMapper;
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long ownerId, @Valid @RequestBody ItemDto itemDto) {
         log.debug("Create request was received in controller {} with data {}", this.getClass(), itemDto.toString());
-        Item item = mapper.toItem(itemDto).setOwner(userService.get(ownerId));
+        User owner = userService.get(ownerId);
+        UserDto ownerDto = userMapper.toUserDto(owner);
+        Item item = mapper.toItem(itemDto.setOwner(ownerDto));
         Item createdItem = itemService.create(item);
         log.debug("Item {} was created successfully in controller {}", createdItem.toString(), this.getClass());
         return mapper.toItemDto(createdItem);

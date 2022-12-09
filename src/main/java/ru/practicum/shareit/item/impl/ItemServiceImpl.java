@@ -3,27 +3,25 @@ package ru.practicum.shareit.item.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.interfaces.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.comments.CommentMapper;
+import ru.practicum.shareit.comments.interfaces.CommentRepository;
+import ru.practicum.shareit.comments.model.Comment;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPartialUpdateDto;
 import ru.practicum.shareit.item.exceptions.ItemAlreadyExistsException;
 import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
-import ru.practicum.shareit.comments.interfaces.CommentRepository;
 import ru.practicum.shareit.item.interfaces.ItemRepository;
 import ru.practicum.shareit.item.interfaces.ItemService;
-import ru.practicum.shareit.comments.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 import ru.practicum.shareit.user.interfaces.UserRepository;
+import ru.practicum.shareit.user.model.User;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,10 +32,9 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
     private final ItemMapper mapper;
-    private final BookingMapper bookingMapper;
-    private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
 
     @Override
@@ -62,7 +59,19 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemDoesNotExistException(itemId));
         ItemDto itemDto = mapper.toItemDto(item);
         if (item.getOwner().getId() == userId) {
-            itemDto = enrichItemDto(itemDto, item);
+            Optional<Booking> lastBookingOpt = bookingRepository.findAllByItem(item)
+                    .stream()
+                    .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
+                    .filter(x -> x.getEnd().isBefore(LocalDateTime.now())).max(Comparator.comparing(Booking::getEnd));
+            Booking lastBooking = lastBookingOpt.orElse(null);
+            Optional<Booking> nextBookingOpt = bookingRepository.findAllByItem(item)
+                    .stream()
+                    .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
+                    .filter(x -> x.getStart().isAfter(LocalDateTime.now())).min(Comparator.comparing(Booking::getStart));
+            Booking nextBooking = nextBookingOpt.orElse(null);
+            itemDto
+                    .setLastBooking(BookingMapper.INSTANCE.bookingToDto(lastBooking))
+                    .setNextBooking(BookingMapper.INSTANCE.bookingToDto(nextBooking));
         }
         List<Comment> comments = commentRepository.findAllByItem(item);
         itemDto.setComments(commentMapper.toDto(comments));
@@ -90,31 +99,21 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Update item request was received in service {}, with data {}",
                 this.getClass(),
                 itemPartialUpdateDto.toString());
-        if (!userRepository.existsById(ownerId)) {
-            throw new UserDoesNotExistException(ownerId);
-        }
+        User user = userRepository.findById(ownerId).orElseThrow(() -> new UserDoesNotExistException(ownerId));
         Item updatedItem = itemRepository
                 .findById(itemPartialUpdateDto.getId())
                 .orElseThrow(() -> new ItemDoesNotExistException(itemPartialUpdateDto.getId()));
-        if (updatedItem.getOwner().getId() != ownerId) {
+        if (!updatedItem.getOwner().equals(user)) {
             throw new ItemDoesNotExistException(itemPartialUpdateDto.getId());
         }
-        Field[] fields = itemPartialUpdateDto.getClass().getDeclaredFields();
-        Field[] itemFields = updatedItem.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            try {
-                if (field.get(itemPartialUpdateDto) != null) {
-                    Field userField = Arrays.stream(itemFields)
-                            .sequential()
-                            .filter(x -> x.getName().equalsIgnoreCase(field.getName()))
-                            .findFirst().orElseThrow(NoSuchFieldException::new);
-                    userField.setAccessible(true);
-                    userField.set(updatedItem, field.get(itemPartialUpdateDto));
-                }
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                log.warn("Mapping partial DTO fields error with message {}", e.getMessage());
-            }
+        if (itemPartialUpdateDto.getName() != null) {
+            updatedItem.setName(itemPartialUpdateDto.getName());
+        }
+        if (itemPartialUpdateDto.getDescription() != null) {
+            updatedItem.setDescription(itemPartialUpdateDto.getDescription());
+        }
+        if (itemPartialUpdateDto.getAvailable() != null) {
+            updatedItem.setAvailable(itemPartialUpdateDto.getAvailable());
         }
         itemRepository.save(updatedItem);
         log.debug("Item {} was updated successfully in service {}", updatedItem, this.getClass());
@@ -137,12 +136,25 @@ public class ItemServiceImpl implements ItemService {
         log.debug("Get all items request is received in service {}", this.getClass());
         User owner = userRepository.findById(ownerId).orElseThrow(() -> new UserDoesNotExistException(ownerId));
         List<Item> items = itemRepository.findAllByOwner(owner);
+        List<Booking> bookings = bookingRepository.findAllByOwner(ownerId);
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
+            Optional<Booking> lastBookingOpt = bookings
+                    .stream()
+                    .filter(x -> x.getItem().equals(item))
+                    .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
+                    .filter(x -> x.getEnd().isBefore(LocalDateTime.now())).max(Comparator.comparing(Booking::getEnd));
+            Booking lastBooking = lastBookingOpt.orElse(null);
+            Optional<Booking> nextBookingOpt = bookings
+                    .stream()
+                    .filter(x -> x.getItem().equals(item))
+                    .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
+                    .filter(x -> x.getStart().isAfter(LocalDateTime.now())).min(Comparator.comparing(Booking::getStart));
+            Booking nextBooking = nextBookingOpt.orElse(null);
             ItemDto itemDto = mapper.toItemDto(item);
-            itemDto = enrichItemDto(itemDto, item);
-            List<Comment> comments = commentRepository.findAllByItem(item);
-            itemDto.setComments(commentMapper.toDto(comments));
+            itemDto
+                    .setLastBooking(BookingMapper.INSTANCE.bookingToDto(lastBooking))
+                    .setNextBooking(BookingMapper.INSTANCE.bookingToDto(nextBooking));
             itemDtos.add(itemDto);
         }
         return itemDtos;
@@ -163,18 +175,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    private ItemDto enrichItemDto(ItemDto itemDto, Item item) {
-        Optional<Booking> lastBooking = bookingRepository.findAllByItem(item)
-                .stream()
-                .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
-                .filter(x -> x.getEnd().isBefore(LocalDateTime.now())).max(Comparator.comparing(Booking::getEnd));
-        BookingDto lastBookingDto = lastBooking.map(bookingMapper::bookingToDto).orElse(null);
-        Optional<Booking> nextBooking = bookingRepository.findAllByItem(item)
-                .stream()
-                .filter(x -> x.getStatus().equals(BookingStatus.APPROVED))
-                .filter(x -> x.getStart().isAfter(LocalDateTime.now())).min(Comparator.comparing(Booking::getStart));
-        BookingDto nextBookingDto = nextBooking.map(bookingMapper::bookingToDto).orElse(null);
-        itemDto.setLastBooking(lastBookingDto).setNextBooking(nextBookingDto);
-        return itemDto;
+    public Item map(Long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(() -> new ItemDoesNotExistException(itemId));
     }
 }
