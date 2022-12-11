@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.handlers;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +29,12 @@ public class UserExceptionHandler {
     @ResponseBody
     public String handleBindingExceptions(final MethodArgumentNotValidException ex) {
         return ex.getFieldError().getDefaultMessage();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    public String handleConstraintViolationException(final ConstraintViolationException ex) {
+        return ex.getMessage();
     }
 }

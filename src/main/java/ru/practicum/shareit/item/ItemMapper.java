@@ -1,24 +1,26 @@
 package ru.practicum.shareit.item;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
-public class ItemMapper {
+import java.util.Collection;
+import java.util.List;
 
-    public static Item toItem(ItemDto itemDto) {
-        return new Item()
-                .setId(itemDto.getId())
-                .setName(itemDto.getName())
-                .setDescription(itemDto.getDescription())
-                .setAvailable(itemDto.getAvailable());
-    }
+@Mapper(componentModel = "spring")
+public interface ItemMapper {
 
-    public static ItemDto toItemDto(Item item) {
-        return new ItemDto()
-                .setId(item.getId())
-                .setName(item.getName())
-                .setDescription(item.getDescription())
-                .setAvailable(item.getAvailable())
-                .setRequest(item.getRequest() != null ? item.getRequest().getItemRequestId() : null);
-    }
+    @Mapping(target = "request", ignore = true)
+    Item toItem(ItemDto itemDto);
+
+    @Mapping(target = "lastBooking", ignore = true)
+    @Mapping(target = "nextBooking", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "request", ignore = true)
+    ItemDto toItemDto(Item item);
+
+    List<ItemDto> toItemDto(Collection<Item> items);
+
+    List<Item> toItem(Collection<ItemDto> itemDtos);
 }
