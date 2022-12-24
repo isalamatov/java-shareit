@@ -18,6 +18,9 @@ import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
 import ru.practicum.shareit.item.interfaces.ItemRepository;
 import ru.practicum.shareit.item.interfaces.ItemService;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.exceptions.ItemRequestDoesNotExistException;
+import ru.practicum.shareit.request.interfaces.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 import ru.practicum.shareit.user.interfaces.UserRepository;
 import ru.practicum.shareit.user.model.User;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ItemServiceImpl implements ItemService {
+    private final ItemRequestRepository itemRequestRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -115,6 +119,12 @@ public class ItemServiceImpl implements ItemService {
         if (itemPartialUpdateDto.getAvailable() != null) {
             updatedItem.setAvailable(itemPartialUpdateDto.getAvailable());
         }
+        if (itemPartialUpdateDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestRepository.findById(itemPartialUpdateDto.getRequestId())
+                    .orElseThrow(() -> new ItemRequestDoesNotExistException(itemPartialUpdateDto.getRequestId()));
+            updatedItem.setRequest(itemRequest);
+            updatedItem.setRequestId(itemRequest.getItemRequestId());
+        }
         itemRepository.save(updatedItem);
         log.debug("Item {} was updated successfully in service {}", updatedItem, this.getClass());
         return updatedItem;
@@ -127,7 +137,11 @@ public class ItemServiceImpl implements ItemService {
             throw new UserDoesNotExistException(ownerId);
         }
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemDoesNotExistException(itemId));
-        itemRepository.delete(item);
+        if (item.getOwner().getId() == ownerId) {
+            itemRepository.delete(item);
+        } else {
+            throw new SecurityException("User has to be owner of the item");
+        }
         log.debug("Item with id {} was deleted successfully in service {}", itemId, this.getClass());
     }
 

@@ -2,10 +2,12 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Item request data transfer object, visible to end user.
@@ -13,10 +15,10 @@ import java.time.ZonedDateTime;
 @Data
 @Accessors(chain = true)
 public class ItemRequestDto {
-    private long itemRequestId;
-    @NotNull
+    private long id;
+    @NotBlank
     private String description;
-    @NotNull
-    private User requestor;
-    private ZonedDateTime created;
+    private UserDto requestor;
+    private LocalDateTime created;
+    private List<ItemDto> items;
 }

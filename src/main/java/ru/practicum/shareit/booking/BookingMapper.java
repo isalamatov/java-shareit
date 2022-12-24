@@ -8,6 +8,7 @@ import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.interfaces.ItemService;
 import ru.practicum.shareit.user.interfaces.UserService;
 
@@ -17,7 +18,7 @@ import java.util.List;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE,
         componentModel = "spring",
         injectionStrategy = InjectionStrategy.FIELD,
-        uses = {ItemService.class, UserService.class})
+        uses = {ItemService.class, UserService.class, ItemMapper.class})
 @AllArgsConstructor
 public abstract class BookingMapper {
 
@@ -28,13 +29,11 @@ public abstract class BookingMapper {
     @Mapping(target = "status", defaultValue = "WAITING")
     public abstract Booking dtoToBooking(BookingDto bookingDto);
 
-    @Mapping(target = "item.request", ignore = true)
+    @Mapping(target = "item.requestId", source = "item.request.itemRequestId")
     @Mapping(target = "id", source = "bookingId")
     @Mapping(target = "bookerId", source = "booker.id")
     @Mapping(target = "itemId", source = "item.id")
     public abstract BookingDto bookingToDto(Booking booking);
-
-    public abstract List<Booking> dtoToBooking(Collection<BookingDto> bookingDto);
 
     public abstract List<BookingDto> bookingToDto(Collection<Booking> booking);
 }

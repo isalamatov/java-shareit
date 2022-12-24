@@ -13,9 +13,11 @@ public interface BookingService {
 
     Booking approve(Long ownerId, Long bookingId, Boolean approved);
 
+    List<Booking> getAllByUserAndState(Long userId, State state, Integer from, Integer size);
+
     List<Booking> getAllByUserAndState(Long userId, State state);
 
-    List<Booking> getAllByOwnerAndState(Long userId, State state);
+    List<Booking> getAllByOwnerAndState(Long userId, State state, Integer from, Integer size);
 
     void validate(BookingDto bookingDto);
 }
