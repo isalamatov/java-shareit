@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.practicum.shareit.item.exceptions.ItemAlreadyExistsException;
 import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
 import ru.practicum.shareit.item.exceptions.UserHasToBeBookerException;
+import ru.practicum.shareit.request.exceptions.ItemRequestDoesNotExistException;
 
 import java.util.Objects;
 
 @ControllerAdvice
 public class ItemExceptionHandler {
-    @ExceptionHandler(ItemDoesNotExistException.class)
+    @ExceptionHandler({ItemDoesNotExistException.class, ItemRequestDoesNotExistException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public String handleNotFoundExceptions(final RuntimeException ex) {

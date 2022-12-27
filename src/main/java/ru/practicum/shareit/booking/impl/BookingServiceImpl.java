@@ -81,6 +81,19 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<Booking> getAllByUserAndState(Long userId, State state, Integer from, Integer size) {
+        log.debug("Get booking request by user was received in service {}, with data {}", this.getClass(), userId);
+        if (from < 0 || size <= 0) {
+            throw new IllegalArgumentException("Offset and limit should be correct values");
+        }
+        User user = userService.get(userId);
+        List<Booking> bookings = filterByState(bookingRepository.findAllByBooker(user), state);
+        bookings = bookings.stream().skip(from).limit(size).collect(Collectors.toList());
+        log.debug("Get booking request by user was processed in service {}, with data {}", this.getClass(), userId);
+        return bookings;
+    }
+
+    @Override
     public List<Booking> getAllByUserAndState(Long userId, State state) {
         log.debug("Get booking request by user was received in service {}, with data {}", this.getClass(), userId);
         User user = userService.get(userId);
@@ -90,10 +103,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getAllByOwnerAndState(Long userId, State state) {
+    public List<Booking> getAllByOwnerAndState(Long userId, State state, Integer from, Integer size) {
         log.debug("Get booking request by owner was received in service {}, with data {}", this.getClass(), userId);
+        if (from < 0 || size <= 0) {
+            throw new IllegalArgumentException("Offset and limit should be correct values");
+        }
         User user = userService.get(userId);
         List<Booking> bookings = filterByState(bookingRepository.findAllByOwner(user.getId()), state);
+        bookings = bookings.stream().skip(from).limit(size).collect(Collectors.toList());
         log.debug("Get booking request by owner was processed in service {}, with data {}", this.getClass(), userId);
         return bookings;
     }

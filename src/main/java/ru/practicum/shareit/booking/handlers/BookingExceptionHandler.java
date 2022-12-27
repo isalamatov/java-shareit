@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.practicum.shareit.booking.exceptions.*;
+import ru.practicum.shareit.booking.exceptions.BookingDoesNotExistsException;
+import ru.practicum.shareit.booking.exceptions.BookingStatusChangeException;
+import ru.practicum.shareit.booking.exceptions.ItemUnavailableException;
+import ru.practicum.shareit.booking.exceptions.UnsupportedStatusException;
 
 import java.util.Objects;
 
@@ -17,13 +20,6 @@ public class BookingExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public String handleNotFoundExceptions(final RuntimeException ex) {
-        return ex.getMessage();
-    }
-
-    @ExceptionHandler(BookingAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ResponseBody
-    public String handleAlreadyExistsExceptions(final RuntimeException ex) {
         return ex.getMessage();
     }
 

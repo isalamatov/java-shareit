@@ -11,7 +11,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import java.util.List;
 
 /**
- * TODO Sprint add-bookings.
+ * Booking controller.
  */
 @RestController
 @Slf4j
@@ -62,11 +62,13 @@ public class BookingController {
     public List<BookingDto> getAllByUserAndState(@RequestHeader("X-Sharer-User-Id")
                                                  Long userId,
                                                  @RequestParam(defaultValue = "ALL")
-                                                 State state) {
+                                                 State state,
+                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                 @RequestParam(required = false, defaultValue = "25") Integer size) {
         log.debug("Get booking requests with params was received in controller {} with data {}",
                 this.getClass(),
                 userId);
-        List<Booking> bookings = bookingService.getAllByUserAndState(userId, state);
+        List<Booking> bookings = bookingService.getAllByUserAndState(userId, state, from, size);
         log.debug("Bookings was retrieved successfully in controller {}", this.getClass());
         return mapper.bookingToDto(bookings);
     }
@@ -75,11 +77,13 @@ public class BookingController {
     public List<BookingDto> getAllByOwnerAndState(@RequestHeader("X-Sharer-User-Id")
                                                   Long userId,
                                                   @RequestParam(defaultValue = "ALL")
-                                                  State state) {
+                                                  State state,
+                                                  @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                  @RequestParam(required = false, defaultValue = "25") Integer size) {
         log.debug("Get booking requests with params was received in controller {} with data {}",
                 this.getClass(),
                 userId);
-        List<Booking> bookings = bookingService.getAllByOwnerAndState(userId, state);
+        List<Booking> bookings = bookingService.getAllByOwnerAndState(userId, state, from, size);
         log.debug("Bookings was retrieved successfully in controller {}", this.getClass());
         return mapper.bookingToDto(bookings);
     }
