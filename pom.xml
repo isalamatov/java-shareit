@@ -26,7 +26,6 @@
     </properties>
 
     <build>
-        <finalName>shareit</finalName>
 <!--        <resources>-->
 <!--            <resource>-->
 <!--                <directory>server/src/main/resources</directory>-->

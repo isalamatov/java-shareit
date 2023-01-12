@@ -38,11 +38,11 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(Long userId, UserDto userDto) {
-        return put("" + userId, userId, null, userDto);
+        return put("/" + userId, userId, null, userDto);
     }
 
     public ResponseEntity<Object> partialUpdate(Long userId, UserPartialUpdateDto userPartialUpdateDto) {
-        return patch("" + userId, userPartialUpdateDto);
+        return patch("/" + userId, userPartialUpdateDto);
     }
 
     public void deleteById(Long userId) {

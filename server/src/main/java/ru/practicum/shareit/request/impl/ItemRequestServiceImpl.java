@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.interfaces.ItemRepository;
 import ru.practicum.shareit.request.exceptions.ItemRequestDoesNotExistException;
 import ru.practicum.shareit.request.interfaces.ItemRequestRepository;
 import ru.practicum.shareit.request.interfaces.ItemRequestService;
@@ -22,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
-    private ItemRepository itemRepository;
 
     @Override
     public ItemRequest create(ItemRequest itemRequest) {
@@ -48,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
         BooleanExpression condition = QItemRequest.itemRequest.requestor.eq(user).not();
         Sort sortOrder = Sort.by("created").descending();
-        Integer pageNumber = from / size;
+        int pageNumber = from / size;
         Pageable page = PageRequest.of(pageNumber, size, sortOrder);
         Iterable<ItemRequest> itemRequests = itemRequestRepository.findAll(condition, page);
         log.debug("List of item requests successfully retrieved from repository");
