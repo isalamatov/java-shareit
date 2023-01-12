@@ -171,6 +171,7 @@ public class ItemServiceImpl implements ItemService {
                     .setNextBooking(BookingMapper.INSTANCE.bookingToDto(nextBooking));
             itemDtos.add(itemDto);
         }
+        itemDtos.sort(Comparator.comparing(ItemDto::getId));
         return itemDtos;
     }
 
