@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {
-        BookingController.class,
+        ServerBookingController.class,
         ItemMapperImpl.class,
         UserMapperImpl.class,
         ItemRequestService.class,
@@ -64,7 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         CommentRepository.class,
         ItemRepository.class
 })
-public class BookingControllerTests {
+public class ServerBookingControllerTests {
     @MockBean
     private BookingService bookingService;
     @MockBean

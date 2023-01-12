@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
-public class BookingController {
+public class ServerBookingController {
     private final BookingService bookingService;
     private final BookingMapper mapper;
 
