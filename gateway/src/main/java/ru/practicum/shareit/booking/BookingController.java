@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.dto.BookingState;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -24,6 +25,7 @@ public class BookingController {
     public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") long userId,
                                          @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Creating booking {}, userId={}", requestDto, userId);
+        validate(requestDto);
         return bookingClient.bookItem(userId, requestDto);
     }
 
@@ -71,6 +73,14 @@ public class BookingController {
                 this.getClass(),
                 userId);
         return bookingClient.getAllByOwnerAndState(userId, state, from, size);
+    }
+
+    public void validate(BookItemRequestDto bookingDto) {
+        LocalDateTime start = bookingDto.getStart();
+        LocalDateTime end = bookingDto.getEnd();
+        if (start.isBefore(LocalDateTime.now()) || end.isBefore(LocalDateTime.now()) || end.isBefore(start)) {
+            throw new IllegalArgumentException("Start and end time should be correct value");
+        }
     }
 }
 

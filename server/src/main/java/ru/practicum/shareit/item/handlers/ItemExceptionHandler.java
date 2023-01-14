@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.handlers;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -11,8 +9,6 @@ import ru.practicum.shareit.item.exceptions.ItemAlreadyExistsException;
 import ru.practicum.shareit.item.exceptions.ItemDoesNotExistException;
 import ru.practicum.shareit.item.exceptions.UserHasToBeBookerException;
 import ru.practicum.shareit.request.exceptions.ItemRequestDoesNotExistException;
-
-import java.util.Objects;
 
 @ControllerAdvice
 public class ItemExceptionHandler {
@@ -27,20 +23,6 @@ public class ItemExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public String handleAlreadyExistsExceptions(final RuntimeException ex) {
-        return ex.getMessage();
-    }
-
-    @ExceptionHandler(BindException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public String handleBindingExceptions(final BindException ex) {
-        return Objects.requireNonNull(ex.getFieldError()).getDefaultMessage();
-    }
-
-    @ExceptionHandler(MissingRequestHeaderException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public String handleMissingHeaderExceptions(final MissingRequestHeaderException ex) {
         return ex.getMessage();
     }
 

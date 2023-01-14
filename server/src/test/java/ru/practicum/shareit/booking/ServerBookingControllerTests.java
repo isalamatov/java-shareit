@@ -157,7 +157,6 @@ public class ServerBookingControllerTests {
     @Test
     void create() throws Exception {
         Mockito.when(bookingService.create(any())).thenReturn(nextBooking.setStatus(BookingStatus.WAITING));
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -177,7 +176,6 @@ public class ServerBookingControllerTests {
     @Test
     void createThrowsException() throws Exception {
         Mockito.when(bookingService.create(any())).thenThrow(new SecurityException(""));
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -190,7 +188,6 @@ public class ServerBookingControllerTests {
     @Test
     void createThrowsExceptionBooking() throws Exception {
         Mockito.when(bookingService.create(any())).thenThrow(new BookingDoesNotExistsException(1L));
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -203,7 +200,6 @@ public class ServerBookingControllerTests {
     @Test
     void createThrowsSecurityException() throws Exception {
         Mockito.when(bookingService.create(any())).thenThrow(new SecurityException(""));
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -216,20 +212,6 @@ public class ServerBookingControllerTests {
     @Test
     void createThrowsItemUnavailableException() throws Exception {
         Mockito.when(bookingService.create(any())).thenThrow(new ItemUnavailableException(1L));
-        Mockito.doNothing().when(bookingService).validate(any());
-        mvc.perform(post("/bookings")
-                        .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("X-Sharer-User-Id", 1L))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    void createThrowsItemIllegalArgumentException() throws Exception {
-        Mockito.when(bookingService.create(any())).thenThrow(new IllegalArgumentException());
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -242,7 +224,6 @@ public class ServerBookingControllerTests {
     @Test
     void createThrowsBookingStatusChangeException() throws Exception {
         Mockito.when(bookingService.create(any())).thenThrow(new BookingStatusChangeException(""));
-        Mockito.doNothing().when(bookingService).validate(any());
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(nextBookingDto.setStatus(null)))
                         .characterEncoding(StandardCharsets.UTF_8)

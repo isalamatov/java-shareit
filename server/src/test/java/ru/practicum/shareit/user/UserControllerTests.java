@@ -93,17 +93,6 @@ public class UserControllerTests {
     }
 
     @Test
-    void createUserWithoutEmail() throws Exception {
-        john.setEmail(null);
-        mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(john))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
     void updateUser() throws Exception {
         Mockito.when(userService.update(any())).thenReturn(john);
 

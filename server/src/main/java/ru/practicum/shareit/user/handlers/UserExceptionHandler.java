@@ -2,8 +2,10 @@ package ru.practicum.shareit.user.handlers;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.practicum.shareit.user.exceptions.UserAlreadyExistsException;
 import ru.practicum.shareit.user.exceptions.UserDoesNotExistException;
 
@@ -22,13 +24,6 @@ public class UserExceptionHandler {
     @ResponseBody
     public String handleAlreadyExistsExceptions(final RuntimeException ex) {
         return ex.getMessage();
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public String handleBindingExceptions(final MethodArgumentNotValidException ex) {
-        return ex.getFieldError().getDefaultMessage();
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

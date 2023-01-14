@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.impl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.exceptions.BookingDoesNotExistsException;
@@ -17,7 +16,6 @@ import ru.practicum.shareit.user.interfaces.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -113,16 +111,6 @@ public class BookingServiceImpl implements BookingService {
         bookings = bookings.stream().skip(from).limit(size).collect(Collectors.toList());
         log.debug("Get booking request by owner was processed in service {}, with data {}", this.getClass(), userId);
         return bookings;
-    }
-
-    @Override
-    public void validate(BookingDto bookingDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        LocalDateTime start = LocalDateTime.parse(bookingDto.getStart(), formatter);
-        LocalDateTime end = LocalDateTime.parse(bookingDto.getEnd(), formatter);
-        if (start.isBefore(LocalDateTime.now()) || end.isBefore(LocalDateTime.now()) || end.isBefore(start)) {
-            throw new IllegalArgumentException("Start and end time should be correct value");
-        }
     }
 
     private List<Booking> filterByState(List<Booking> bookings, State state) {

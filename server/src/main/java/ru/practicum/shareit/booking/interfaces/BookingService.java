@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.interfaces;
 
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.model.Booking;
 
@@ -18,6 +17,4 @@ public interface BookingService {
     List<Booking> getAllByUserAndState(Long userId, State state);
 
     List<Booking> getAllByOwnerAndState(Long userId, State state, Integer from, Integer size);
-
-    void validate(BookingDto bookingDto);
 }
